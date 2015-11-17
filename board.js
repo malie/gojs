@@ -185,13 +185,18 @@ var coordSet = (function () {
     }
   }, {
     key: 'add',
-    value: function add(coord) {
-      this.set.add(coord);
+    value: function add(coordidx) {
+      this.set.add(coordidx);
     }
   }, {
     key: 'delete',
-    value: function _delete(coord) {
-      this.set['delete'](coord);
+    value: function _delete(coordidx) {
+      this.set['delete'](coordidx);
+    }
+  }, {
+    key: 'has',
+    value: function has(coordidx) {
+      return this.set.has(coordidx);
     }
   }]);
 
@@ -300,6 +305,16 @@ var chain = (function () {
     value: function takeAwayLib(lib) {
       this.libs['delete'](lib.index());
     }
+  }, {
+    key: 'addLib',
+    value: function addLib(lib) {
+      this.libs.add(lib.index());
+    }
+  }, {
+    key: 'hasLib',
+    value: function hasLib(lib) {
+      return this.libs.has(lib.index());
+    }
   }]);
 
   return chain;
@@ -382,6 +397,236 @@ var board = (function () {
       }
 
       this.fields[coidx] = col;
+
+      var ch = new chain(co, this.freeFieldsAround(co));
+      this.chains.set(co.index(), ch);
+
+      var _iteratorNormalCompletion6 = true;
+      var _didIteratorError6 = false;
+      var _iteratorError6 = undefined;
+
+      try {
+        for (var _iterator6 = co.neighbours()[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+          var n = _step6.value;
+
+          if (this.fieldAt(n) !== empty) this.takeAwayLib(n, co, col);
+        }
+      } catch (err) {
+        _didIteratorError6 = true;
+        _iteratorError6 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion6 && _iterator6['return']) {
+            _iterator6['return']();
+          }
+        } finally {
+          if (_didIteratorError6) {
+            throw _iteratorError6;
+          }
+        }
+      }
+
+      var _iteratorNormalCompletion7 = true;
+      var _didIteratorError7 = false;
+      var _iteratorError7 = undefined;
+
+      try {
+        for (var _iterator7 = co.neighbours()[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+          var n = _step7.value;
+
+          if (this.fieldAt(n) === col) {
+            this.ufAdd(n, co);
+          }
+        }
+      } catch (err) {
+        _didIteratorError7 = true;
+        _iteratorError7 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion7 && _iterator7['return']) {
+            _iterator7['return']();
+          }
+        } finally {
+          if (_didIteratorError7) {
+            throw _iteratorError7;
+          }
+        }
+      }
+
+      return true;
+    }
+  }, {
+    key: 'ufAdd',
+    value: function ufAdd(a, b) {
+      var ap = this.ufLookup(a);
+      var bp = this.ufLookup(b);
+      if (ap != bp) {
+        var ab = this.merge(ap, bp);
+        if (ab != ap) this.parents.set(ap.index(), ab);
+        if (ab != bp) this.parents.set(bp.index(), ab);
+      }
+    }
+  }, {
+    key: 'merge',
+    value: function merge(a, b) {
+      var ach = this.chainAt(a);
+      var bch = this.chainAt(b);
+      if (ach.numStones() > bch.numStones()) {
+        ach.addFrom(bch);
+        this.chains['delete'](b.index());
+        return a;
+      } else {
+        bch.addFrom(ach);
+        this.chains['delete'](a.index());
+        return b;
+      }
+    }
+  }, {
+    key: 'fieldAt',
+    value: function fieldAt(co) {
+      return this.fields[co.index()];
+    }
+  }, {
+    key: 'isEmptyAt',
+    value: function isEmptyAt(co) {
+      return this.fieldAt(co) === empty;
+    }
+  }, {
+    key: 'freeFieldsAround',
+    value: function freeFieldsAround(co) {
+      var res = [];
+      var _iteratorNormalCompletion8 = true;
+      var _didIteratorError8 = false;
+      var _iteratorError8 = undefined;
+
+      try {
+        for (var _iterator8 = co.neighbours()[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+          var n = _step8.value;
+
+          if (this.isEmptyAt(n)) res.push(n);
+        }
+      } catch (err) {
+        _didIteratorError8 = true;
+        _iteratorError8 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion8 && _iterator8['return']) {
+            _iterator8['return']();
+          }
+        } finally {
+          if (_didIteratorError8) {
+            throw _iteratorError8;
+          }
+        }
+      }
+
+      return res;
+    }
+
+    // union-find
+
+  }, {
+    key: 'ufLookup',
+    value: function ufLookup(x) {
+      var idx = x.index();
+      if (this.parents.has(idx)) {
+        var par = this.parents.get(idx);
+        var res = this.ufLookup(par);
+        if (par != res) this.parents.set(idx, res);
+        return res;
+      } else return x;
+    }
+  }, {
+    key: 'chainAt',
+    value: function chainAt(co) {
+      var p = this.ufLookup(co);
+      return this.chains.get(p.index());
+    }
+  }, {
+    key: 'numLibsAt',
+    value: function numLibsAt(co) {
+      return this.chainAt(co).numLibs();
+    }
+  }, {
+    key: 'numStonesAt',
+    value: function numStonesAt(co) {
+      return this.chainAt(co).numStones();
+    }
+
+    // take away one lib from the group at 'coord'
+  }, {
+    key: 'takeAwayLib',
+    value: function takeAwayLib(coord, lib, takerCol) {
+      var p = this.ufLookup(coord);
+      var byOther = this.fieldAt(p) != takerCol;
+      var ch = this.chainAt(p);
+      if (ch) {
+        ch.takeAwayLib(lib);
+        if (byOther && ch.isDead()) this.killGroup(p, takerCol);
+      }
+    }
+  }, {
+    key: 'killGroup',
+    value: function killGroup(p, takerCol) {
+      var pidx = p.index();
+      var ch = this.chains.get(pidx);
+      this.chains['delete'](pidx);
+      var _iteratorNormalCompletion9 = true;
+      var _didIteratorError9 = false;
+      var _iteratorError9 = undefined;
+
+      try {
+        for (var _iterator9 = ch.stones.set[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+          var fidx = _step9.value;
+
+          var f = coord.fromIndex(fidx);
+          var _iteratorNormalCompletion10 = true;
+          var _didIteratorError10 = false;
+          var _iteratorError10 = undefined;
+
+          try {
+            for (var _iterator10 = f.neighbours()[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+              var n = _step10.value;
+
+              if (this.fieldAt(n) === takerCol) {
+                var np = this.ufLookup(n);
+                var och = this.chains.get(np.index());
+                assert(och);
+                och.addLib(f);
+              }
+            }
+          } catch (err) {
+            _didIteratorError10 = true;
+            _iteratorError10 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion10 && _iterator10['return']) {
+                _iterator10['return']();
+              }
+            } finally {
+              if (_didIteratorError10) {
+                throw _iteratorError10;
+              }
+            }
+          }
+
+          this.fields[f.index()] = empty;
+          this.parents['delete'](fidx);
+        }
+      } catch (err) {
+        _didIteratorError9 = true;
+        _iteratorError9 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion9 && _iterator9['return']) {
+            _iterator9['return']();
+          }
+        } finally {
+          if (_didIteratorError9) {
+            throw _iteratorError9;
+          }
+        }
+      }
     }
   }, {
     key: 'toString',
@@ -419,23 +664,68 @@ var board = (function () {
 
 exports.board = board;
 
-function testBoard() {
+function testBoard1() {
   var b = new board();
-  b.place(black, coord.fromName('D4'));
-  b.place(white, coord.fromName('C3'));
-  b.place(black, coord.fromName('C4'));
-  b.place(white, coord.fromName('D3'));
-  b.place(black, coord.fromName('E3'));
-  b.place(white, coord.fromName('E2'));
-  b.place(black, coord.fromName('F2'));
-  b.place(white, coord.fromName('F3'));
-  console.log(b.toString());
+  var c3 = coord.fromName('C3');
+  b.place(black, c3);
+  assert.equal(4, b.numLibsAt(c3));
+
+  var d3 = coord.fromName('D3');
+  b.place(white, d3);
+  assert.equal(3, b.numLibsAt(c3));
+  assert.equal(3, b.numLibsAt(d3));
+
+  var b3 = coord.fromName('B3');
+  b.place(white, b3);
+  assert.equal(2, b.numLibsAt(c3));
+
+  var c2 = coord.fromName('C2');
+  b.place(white, c2);
+  assert.equal(1, b.numLibsAt(c3));
+
+  var c4 = coord.fromName('C4');
+  b.place(white, c4);
+  assert(b.isEmptyAt(c3));
+  assert(!b.parents.get(c3.index));
+}
+
+function testBoard2() {
+  var b = new board();
+  b.place(black, coord.fromName('C1'));
+  b.place(black, coord.fromName('D1'));
+  b.place(black, coord.fromName('A1'));
+  b.place(black, coord.fromName('A2'));
+
+  assert.equal(b.numLibsAt(coord.fromName('C1')), 4);
+  assert.equal(b.numLibsAt(coord.fromName('A1')), 3);
+  assert.notEqual(b.ufLookup(coord.fromName('C1')), b.ufLookup(coord.fromName('A1')));
+
+  b.place(black, coord.fromName('B1'));
+  // console.log(b.toString())
+
+  assert.equal(b.ufLookup(coord.fromName('C1')), b.ufLookup(coord.fromName('A1')));
+  assert.equal(b.numLibsAt(coord.fromName('A1')), 5);
+
+  var ch = b.chainAt(coord.fromName('A1'));
+  ch.hasLib(coord.fromName('A3'));
+  ch.hasLib(coord.fromName('B2'));
+  ch.hasLib(coord.fromName('C2'));
+  ch.hasLib(coord.fromName('D2'));
+  ch.hasLib(coord.fromName('E1'));
+
+  b.place(white, coord.fromName('A3'));
+  b.place(white, coord.fromName('B2'));
+  b.place(white, coord.fromName('C2'));
+  b.place(white, coord.fromName('D2'));
+  b.place(white, coord.fromName('E1'));
+  // console.log(b.toString())
 }
 
 function runAllTests() {
   testCoord();
   testChain();
-  testBoard();
+  testBoard1();
+  testBoard2();
 }
 
 runAllTests();

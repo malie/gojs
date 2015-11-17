@@ -60,10 +60,12 @@ class coordSet {
     return '{' + xs.join(', ') + '}'}
   size() {
     return this.set.size}
-  add(coord) {
-    this.set.add(coord)}
-  delete(coord) {
-    this.set.delete(coord)}
+  add(coordidx) {
+    this.set.add(coordidx)}
+  delete(coordidx) {
+    this.set.delete(coordidx)}
+  has(coordidx) {
+    return this.set.has(coordidx)}
 }
 
 
@@ -118,7 +120,10 @@ export class chain {
       this.libs.add(l)}
   takeAwayLib(lib) {
     this.libs.delete(lib.index())}
-  
+  addLib(lib) {
+    this.libs.add(lib.index())}
+  hasLib(lib) {
+    return this.libs.has(lib.index())}
 }
 
 function testChain() {
@@ -187,8 +192,104 @@ export class board {
       return false}
 
     this.fields[coidx] = col
-  }
+    
+    let ch = new chain(co, this.freeFieldsAround(co))
+    this.chains.set(co.index(), ch);
 
+    for (let n of co.neighbours()) {
+      if (this.fieldAt(n) !== empty)
+	this.takeAwayLib(n, co, col)}
+
+    for (let n of co.neighbours()) {
+      if (this.fieldAt(n) === col) {
+	this.ufAdd(n, co)}}
+
+    return true}
+
+  ufAdd(a, b) {
+    let ap = this.ufLookup(a)
+    let bp = this.ufLookup(b)
+    if (ap != bp) {
+      let ab = this.merge(ap, bp)
+      if (ab != ap)
+	this.parents.set(ap.index(), ab)
+      if (ab != bp)
+	this.parents.set(bp.index(), ab)}}
+  
+  merge(a, b) {
+    let ach = this.chainAt(a)
+    let bch = this.chainAt(b)
+    if (ach.numStones() > bch.numStones()) {
+      ach.addFrom(bch)
+      this.chains.delete(b.index())
+      return a}
+    else {
+      bch.addFrom(ach)
+      this.chains.delete(a.index())
+      return b}}
+  
+  fieldAt(co) {
+    return this.fields[co.index()]}
+  
+  isEmptyAt(co) {
+    return this.fieldAt(co) === empty}
+
+  freeFieldsAround(co) {
+    let res = []
+    for (let n of co.neighbours()) {
+      if (this.isEmptyAt(n))
+	res.push(n)}
+    return res}
+
+  // union-find
+  
+  ufLookup(x) {
+    let idx = x.index();
+    if (this.parents.has(idx)) {
+      let par = this.parents.get(idx)
+      let res = this.ufLookup(par)
+      if (par != res)
+	this.parents.set(idx, res)
+      return res}
+    else
+      return x}
+
+  
+  chainAt(co) {
+    let p = this.ufLookup(co)
+    return this.chains.get(p.index())}
+  
+  numLibsAt(co) {
+    return this.chainAt(co).numLibs()}
+
+  numStonesAt(co) {
+    return this.chainAt(co).numStones()}
+
+  // take away one lib from the group at 'coord'
+  takeAwayLib(coord, lib, takerCol) {
+    let p = this.ufLookup(coord)
+    let byOther = this.fieldAt(p) != takerCol
+    let ch = this.chainAt(p)
+    if (ch) {
+      ch.takeAwayLib(lib)
+      if (byOther && ch.isDead())
+	this.killGroup(p, takerCol)}}
+
+  killGroup(p, takerCol) {
+    let pidx = p.index()
+    let ch = this.chains.get(pidx);
+    this.chains.delete(pidx)
+    for (let fidx of ch.stones.set) {
+      let f = coord.fromIndex(fidx)
+      for (let n of f.neighbours()) {
+	if (this.fieldAt(n) === takerCol) {
+	  let np = this.ufLookup(n)
+	  let och = this.chains.get(np.index())
+	  assert(och)
+	  och.addLib(f)}}
+      this.fields[f.index()] = empty
+      this.parents.delete(fidx)}}
+  
   toString() {
     let p = '      '
     let letters =
@@ -216,23 +317,69 @@ export class board {
   }
 }
 
-function testBoard() {
+function testBoard1() {
   let b = new board()
-  b.place(black, coord.fromName('D4'))
-  b.place(white, coord.fromName('C3'))
-  b.place(black, coord.fromName('C4'))
-  b.place(white, coord.fromName('D3'))
-  b.place(black, coord.fromName('E3'))
-  b.place(white, coord.fromName('E2'))
-  b.place(black, coord.fromName('F2'))
-  b.place(white, coord.fromName('F3'))
-  console.log(b.toString())
+  let c3 = coord.fromName('C3');
+  b.place(black, c3)
+  assert.equal(4, b.numLibsAt(c3))
+
+  let d3 = coord.fromName('D3');
+  b.place(white, d3)
+  assert.equal(3, b.numLibsAt(c3))
+  assert.equal(3, b.numLibsAt(d3))
+
+  let b3 = coord.fromName('B3');
+  b.place(white, b3)
+  assert.equal(2, b.numLibsAt(c3))
+
+  let c2 = coord.fromName('C2');
+  b.place(white, c2)
+  assert.equal(1, b.numLibsAt(c3))
+
+  let c4 = coord.fromName('C4');
+  b.place(white, c4)
+  assert(b.isEmptyAt(c3))
+  assert(!b.parents.get(c3.index))}
+
+function testBoard2() {
+  let b = new board()
+  b.place(black, coord.fromName('C1'))
+  b.place(black, coord.fromName('D1'))
+  b.place(black, coord.fromName('A1'))
+  b.place(black, coord.fromName('A2'))
+  
+  assert.equal(b.numLibsAt(coord.fromName('C1')), 4)
+  assert.equal(b.numLibsAt(coord.fromName('A1')), 3)
+  assert.notEqual(b.ufLookup(coord.fromName('C1')),
+		  b.ufLookup(coord.fromName('A1')))
+
+  b.place(black, coord.fromName('B1'))
+  // console.log(b.toString())
+  
+  assert.equal(b.ufLookup(coord.fromName('C1')),
+	       b.ufLookup(coord.fromName('A1')))
+  assert.equal(b.numLibsAt(coord.fromName('A1')), 5)
+  
+  let ch = b.chainAt(coord.fromName('A1'))
+  ch.hasLib(coord.fromName('A3'))
+  ch.hasLib(coord.fromName('B2'))
+  ch.hasLib(coord.fromName('C2'))
+  ch.hasLib(coord.fromName('D2'))
+  ch.hasLib(coord.fromName('E1'))
+
+  b.place(white, coord.fromName('A3'))
+  b.place(white, coord.fromName('B2'))
+  b.place(white, coord.fromName('C2'))
+  b.place(white, coord.fromName('D2'))
+  b.place(white, coord.fromName('E1'))
+  // console.log(b.toString())
 }
 
 export function runAllTests() {
   testCoord()
   testChain()
-  testBoard()
+  testBoard1()
+  testBoard2()
 }
 
 runAllTests()
