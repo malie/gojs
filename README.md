@@ -5,4 +5,4 @@ Beginnings of a Go board implemented in javascript.
 
 ## Compile
 
-babel board.es6 --out-file board.js --watch --debug
+babel *.es6 --out-dir ./ --watch --retain-lines

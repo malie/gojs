@@ -1,7 +1,7 @@
 let assert = require('assert')
 
-const S = 19
-const S2 = S*S
+export const S = 19
+export const S2 = S*S
 
 const go_xcoords = 'ABCDEFGHJKLMNOPQRST'
 
@@ -45,6 +45,13 @@ class coordSet {
     for (let c of coords) {
       assert(c.isCoord())
       this.set.add(c.index())}}
+
+  clone() {
+    let res = new coordSet([])
+    for (var ci of this.set) {
+      res.set.add(ci)}
+    return res}
+  
   equals(other) {
     for (let x of other.set) {
       if (!this.set.has(x))
@@ -102,11 +109,23 @@ export function testCoord() {
 
 export class chain {
   constructor(stone, libs) {
-    this.stones = new coordSet([stone])
-    this.libs = new coordSet(libs)}
+    if (stone) { // for clone support
+      this.stones = new coordSet([stone])
+      this.libs = new coordSet(libs)}
+    else {
+      this.stones = null
+      this.libs = null}}
+  
   toString() {
     return ['chain stones:', this.stones.toString(),
 	    'libs:', this.libs.toString()].join(' ')}
+
+  clone() {
+    let res = new chain(false, false)
+    res.stones = this.stones.clone()
+    res.libs = this.libs.clone()
+    return res}
+
   numStones() {
     return this.stones.size()}
   numLibs() {
@@ -181,8 +200,17 @@ export class board {
     this.chains = new Map()
     // field content
     this.fields = new Int8Array(S2)
-    this.fields.fill(empty)
-  }
+    this.fields.fill(empty)}
+
+  clone() {
+    let res = new board();
+    res.fields = new Int8Array(this.fields)
+    res.parents = new Map(this.parents)
+    res.chains = new Map()
+    for (let co of this.chains.keys()) {
+      res.chains.set(co, this.chains.get(co).clone())}
+    return res}
+  
   place(col, co) {
     assert(col == black || col == white)
     assert(co.isCoord())
@@ -233,6 +261,10 @@ export class board {
   
   isEmptyAt(co) {
     return this.fieldAt(co) === empty}
+
+  isStoneAt(co, col) {
+    assert(col === white || col === black)
+    return this.fieldAt(co) === col}
 
   freeFieldsAround(co) {
     let res = []
@@ -313,8 +345,14 @@ export class board {
     }
     lines.push(border)
     lines.push(letters)
-    return lines.join('\n')
-  }
+    return lines.join('\n')}
+
+
+  iterateAllStones(f) {
+    for (var i = 0; i < S2; i++) {
+      let col = this.fields[i];
+      if (col != empty) {
+	f(col, coord.fromIndex(i))}}}
 }
 
 function testBoard1() {
@@ -375,11 +413,21 @@ function testBoard2() {
   // console.log(b.toString())
 }
 
+function testBoardClone() {
+  let b = new board()
+  b.place(black, coord.fromName('C1'))
+  let c = b.clone()
+  assert(c.numLibsAt(coord.fromName('C1')) == 3)
+}
+
+
 export function runAllTests() {
   testCoord()
   testChain()
   testBoard1()
   testBoard2()
+  testBoardClone()
+  console.log('board tests ok')
 }
 
-runAllTests()
+// runAllTests()
