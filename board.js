@@ -1,4 +1,4 @@
-'use strict';Object.defineProperty(exports, '__esModule', { value: true });var _createClass = (function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};})();exports.testCoord = testCoord;exports.runAllTests = runAllTests;function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError('Cannot call a class as a function');}}var assert = require('assert');
+'use strict';Object.defineProperty(exports, '__esModule', { value: true });var _createClass = (function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};})();exports.testCoord = testCoord;exports.assertIsColor = assertIsColor;exports.otherColor = otherColor;exports.runAllTests = runAllTests;function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError('Cannot call a class as a function');}}var assert = require('assert');
 
 var S = 19;exports.S = S;
 var S2 = S * S;exports.S2 = S2;
@@ -13,7 +13,10 @@ coord = (function () {
     this.yc = y;}_createClass(coord, [{ key: 'isCoord', value: 
     function isCoord() {return true;} }, { key: 'x', value: 
     function x() {return this.xc;} }, { key: 'y', value: 
-    function y() {return this.yc;} }, { key: 'index', value: 
+    function y() {return this.yc;} }, { key: 'equals', value: 
+    function equals(o) {
+      return this.xc == o.xc && 
+      this.yc == o.yc;} }, { key: 'index', value: 
     function index() {
       return S * this.yc + this.xc;} }, { key: 'neighbours', value: 
 
@@ -190,7 +193,14 @@ function twoDigits(n) {
 
 var black = 0;exports.black = black;
 var white = 1;exports.white = white;
-var empty = 2;exports.empty = empty;var 
+var empty = 2;exports.empty = empty;
+
+function assertIsColor(col) {
+  assert(col === black || col === white);}
+
+function otherColor(col) {
+  assertIsColor(col);
+  return black + white - col;}var 
 
 board = (function () {
   function board() {_classCallCheck(this, board);
@@ -212,7 +222,7 @@ board = (function () {
       return res;} }, { key: 'place', value: 
 
     function place(col, co) {
-      assert(col == black || col == white);
+      assertIsColor(col);
       assert(co.isCoord());
       var coidx = co.index();
       if (this.fields[coidx] != empty) {
@@ -237,7 +247,7 @@ board = (function () {
     function ufAdd(a, b) {
       var ap = this.ufLookup(a);
       var bp = this.ufLookup(b);
-      if (ap != bp) {
+      if (!ap.equals(bp)) {
         var ab = this.merge(ap, bp);
         if (ab != ap) 
         this.parents.set(ap.index(), ab);
@@ -279,8 +289,10 @@ board = (function () {
       var idx = x.index();
       if (this.parents.has(idx)) {
         var par = this.parents.get(idx);
+        if (x.equals(par)) 
+        return par;
         var res = this.ufLookup(par);
-        if (par != res) 
+        if (!par.equals(res)) 
         this.parents.set(idx, res);
         return res;} else 
 

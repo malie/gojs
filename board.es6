@@ -14,6 +14,9 @@ export class coord {
   isCoord() { return true}
   x() { return this.xc }
   y() { return this.yc }
+  equals(o) {
+    return (this.xc == o.xc
+	    && this.yc == o.yc)}
   index() {
     return S*this.yc + this.xc}
   static fromIndex(i) {
@@ -192,6 +195,13 @@ export const black = 0
 export const white = 1
 export const empty = 2
 
+export function assertIsColor(col) {
+  assert(col === black || col === white)}
+
+export function otherColor(col) {
+  assertIsColor(col)
+  return (black+white)-col}
+
 export class board {
   constructor() {
     // mapping coord index to parent coord index, union-find
@@ -212,7 +222,7 @@ export class board {
     return res}
   
   place(col, co) {
-    assert(col == black || col == white)
+    assertIsColor(col)
     assert(co.isCoord())
     let coidx = co.index()
     if (this.fields[coidx] != empty) {
@@ -237,7 +247,7 @@ export class board {
   ufAdd(a, b) {
     let ap = this.ufLookup(a)
     let bp = this.ufLookup(b)
-    if (ap != bp) {
+    if (!ap.equals(bp)) {
       let ab = this.merge(ap, bp)
       if (ab != ap)
 	this.parents.set(ap.index(), ab)
@@ -279,8 +289,10 @@ export class board {
     let idx = x.index();
     if (this.parents.has(idx)) {
       let par = this.parents.get(idx)
+      if (x.equals(par))
+      	return par
       let res = this.ufLookup(par)
-      if (par != res)
+      if (!par.equals(res))
 	this.parents.set(idx, res)
       return res}
     else
