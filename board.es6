@@ -37,6 +37,29 @@ export class coord {
     if (this.yc < S-1)
       res.push(new coord(this.xc, this.yc+1))
     return res}
+  diagonalNeighbours() {
+    let res = []
+    let xc = this.xc
+    let yc = this.yc;
+    function p(dx,dy) {
+      let x = xc + dx
+      let y = yc + dy
+      if (x >= 0 && x < S && y >= 0 && y < S)
+	res.push(new coord(x, y))}
+    p(-1,-1)
+    p(1,-1)
+    p(1,1)
+    p(-1,1)
+    return res}
+  
+  displace(dx, dy) {
+    let x = this.xc + dx
+    let y = this.yc + dy
+    if (x >= 0 && x < S && y >= 0 && y < S)
+      return new coord(x, y)
+    else
+      return null}
+  
   toString() {
     return go_xcoords[this.xc] + (this.yc+1)}
 }
@@ -220,6 +243,24 @@ export class board {
     for (let co of this.chains.keys()) {
       res.chains.set(co, this.chains.get(co).clone())}
     return res}
+
+  canPlace(col, co) {
+    assertIsColor(col)
+    assert(co.isCoord())
+    let coidx = co.index()
+    if (this.fields[coidx] != empty)
+      return false
+    let ocol = otherColor(col)
+    for (var n of co.neighbours()) {
+      let f = this.fields[n.index()]
+      if (f === empty)
+	return true
+      let nl = this.numLibsAt(n)
+      if (f === col && nl > 1)
+	return true
+      if (f === ocol && nl === 1)
+	return true}
+    return false}
   
   place(col, co) {
     assertIsColor(col)
@@ -309,6 +350,9 @@ export class board {
   numStonesAt(co) {
     return this.chainAt(co).numStones()}
 
+  stonesOfChainAt(co) {
+    return this.chainAt(co).stones.set}
+
   // take away one lib from the group at 'coord'
   takeAwayLib(coord, lib, takerCol) {
     let p = this.ufLookup(coord)
@@ -350,7 +394,8 @@ export class board {
 	line.push(' ')
 	let t = this.fields[new coord(x,y).index()];
 	assert(t === black || t === white || t === empty)
-	line.push(['○', '●', ' '][t])
+	let emp = markedField(x,y) ? '\u00B7' : ' ';
+	line.push(['○', '●', emp][t])
       }
       line.push('|| ' + twoDigits(y+1))
       lines.push(line.join(''))
@@ -366,6 +411,10 @@ export class board {
       if (col != empty) {
 	f(col, coord.fromIndex(i))}}}
 }
+
+function markedField(x,y) {
+  return ((x == 3 || x == S-1-3 || x == 9)
+	  && (y == 3 || y == S-1-3 || y == 9))}
 
 function testBoard1() {
   let b = new board()

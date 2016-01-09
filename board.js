@@ -36,7 +36,30 @@ coord = (function () {
       res.push(new coord(this.xc, this.yc - 1));
       if (this.yc < S - 1) 
       res.push(new coord(this.xc, this.yc + 1));
-      return res;} }, { key: 'toString', value: 
+      return res;} }, { key: 'diagonalNeighbours', value: 
+    function diagonalNeighbours() {
+      var res = [];
+      var xc = this.xc;
+      var yc = this.yc;
+      function p(dx, dy) {
+        var x = xc + dx;
+        var y = yc + dy;
+        if (x >= 0 && x < S && y >= 0 && y < S) 
+        res.push(new coord(x, y));}
+      p(-1, -1);
+      p(1, -1);
+      p(1, 1);
+      p(-1, 1);
+      return res;} }, { key: 'displace', value: 
+
+    function displace(dx, dy) {
+      var x = this.xc + dx;
+      var y = this.yc + dy;
+      if (x >= 0 && x < S && y >= 0 && y < S) 
+      return new coord(x, y);else 
+
+      return null;} }, { key: 'toString', value: 
+
     function toString() {
       return go_xcoords[this.xc] + (this.yc + 1);} }], [{ key: 'fromIndex', value: function fromIndex(i) {return new coord(i % S, Math.floor(i / S));} }, { key: 'fromName', value: function fromName(nm) {var x = go_xcoords.indexOf(nm[0]);assert(x >= 0);var y = parseInt(nm.slice(1)) - 1;return new coord(x, y);} }]);return coord;})();exports.coord = coord;var 
 
@@ -219,7 +242,25 @@ board = (function () {
       res.chains = new Map();var _iteratorNormalCompletion7 = true;var _didIteratorError7 = false;var _iteratorError7 = undefined;try {
         for (var _iterator7 = this.chains.keys()[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {var co = _step7.value;
           res.chains.set(co, this.chains.get(co).clone());}} catch (err) {_didIteratorError7 = true;_iteratorError7 = err;} finally {try {if (!_iteratorNormalCompletion7 && _iterator7['return']) {_iterator7['return']();}} finally {if (_didIteratorError7) {throw _iteratorError7;}}}
-      return res;} }, { key: 'place', value: 
+      return res;} }, { key: 'canPlace', value: 
+
+    function canPlace(col, co) {
+      assertIsColor(col);
+      assert(co.isCoord());
+      var coidx = co.index();
+      if (this.fields[coidx] != empty) 
+      return false;
+      var ocol = otherColor(col);var _iteratorNormalCompletion8 = true;var _didIteratorError8 = false;var _iteratorError8 = undefined;try {
+        for (var _iterator8 = co.neighbours()[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {var n = _step8.value;
+          var f = this.fields[n.index()];
+          if (f === empty) 
+          return true;
+          var nl = this.numLibsAt(n);
+          if (f === col && nl > 1) 
+          return true;
+          if (f === ocol && nl === 1) 
+          return true;}} catch (err) {_didIteratorError8 = true;_iteratorError8 = err;} finally {try {if (!_iteratorNormalCompletion8 && _iterator8['return']) {_iterator8['return']();}} finally {if (_didIteratorError8) {throw _iteratorError8;}}}
+      return false;} }, { key: 'place', value: 
 
     function place(col, co) {
       assertIsColor(col);
@@ -232,15 +273,15 @@ board = (function () {
       this.fields[coidx] = col;
 
       var ch = new chain(co, this.freeFieldsAround(co));
-      this.chains.set(co.index(), ch);var _iteratorNormalCompletion8 = true;var _didIteratorError8 = false;var _iteratorError8 = undefined;try {
-
-        for (var _iterator8 = co.neighbours()[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {var n = _step8.value;
-          if (this.fieldAt(n) !== empty) 
-          this.takeAwayLib(n, co, col);}} catch (err) {_didIteratorError8 = true;_iteratorError8 = err;} finally {try {if (!_iteratorNormalCompletion8 && _iterator8['return']) {_iterator8['return']();}} finally {if (_didIteratorError8) {throw _iteratorError8;}}}var _iteratorNormalCompletion9 = true;var _didIteratorError9 = false;var _iteratorError9 = undefined;try {
+      this.chains.set(co.index(), ch);var _iteratorNormalCompletion9 = true;var _didIteratorError9 = false;var _iteratorError9 = undefined;try {
 
         for (var _iterator9 = co.neighbours()[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {var n = _step9.value;
+          if (this.fieldAt(n) !== empty) 
+          this.takeAwayLib(n, co, col);}} catch (err) {_didIteratorError9 = true;_iteratorError9 = err;} finally {try {if (!_iteratorNormalCompletion9 && _iterator9['return']) {_iterator9['return']();}} finally {if (_didIteratorError9) {throw _iteratorError9;}}}var _iteratorNormalCompletion10 = true;var _didIteratorError10 = false;var _iteratorError10 = undefined;try {
+
+        for (var _iterator10 = co.neighbours()[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {var n = _step10.value;
           if (this.fieldAt(n) === col) {
-            this.ufAdd(n, co);}}} catch (err) {_didIteratorError9 = true;_iteratorError9 = err;} finally {try {if (!_iteratorNormalCompletion9 && _iterator9['return']) {_iterator9['return']();}} finally {if (_didIteratorError9) {throw _iteratorError9;}}}
+            this.ufAdd(n, co);}}} catch (err) {_didIteratorError10 = true;_iteratorError10 = err;} finally {try {if (!_iteratorNormalCompletion10 && _iterator10['return']) {_iterator10['return']();}} finally {if (_didIteratorError10) {throw _iteratorError10;}}}
 
       return true;} }, { key: 'ufAdd', value: 
 
@@ -277,10 +318,10 @@ board = (function () {
       return this.fieldAt(co) === col;} }, { key: 'freeFieldsAround', value: 
 
     function freeFieldsAround(co) {
-      var res = [];var _iteratorNormalCompletion10 = true;var _didIteratorError10 = false;var _iteratorError10 = undefined;try {
-        for (var _iterator10 = co.neighbours()[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {var n = _step10.value;
+      var res = [];var _iteratorNormalCompletion11 = true;var _didIteratorError11 = false;var _iteratorError11 = undefined;try {
+        for (var _iterator11 = co.neighbours()[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {var n = _step11.value;
           if (this.isEmptyAt(n)) 
-          res.push(n);}} catch (err) {_didIteratorError10 = true;_iteratorError10 = err;} finally {try {if (!_iteratorNormalCompletion10 && _iterator10['return']) {_iterator10['return']();}} finally {if (_didIteratorError10) {throw _iteratorError10;}}}
+          res.push(n);}} catch (err) {_didIteratorError11 = true;_iteratorError11 = err;} finally {try {if (!_iteratorNormalCompletion11 && _iterator11['return']) {_iterator11['return']();}} finally {if (_didIteratorError11) {throw _iteratorError11;}}}
       return res;}
 
     // union-find
@@ -307,7 +348,10 @@ board = (function () {
       return this.chainAt(co).numLibs();} }, { key: 'numStonesAt', value: 
 
     function numStonesAt(co) {
-      return this.chainAt(co).numStones();}
+      return this.chainAt(co).numStones();} }, { key: 'stonesOfChainAt', value: 
+
+    function stonesOfChainAt(co) {
+      return this.chainAt(co).stones.set;}
 
     // take away one lib from the group at 'coord'
   }, { key: 'takeAwayLib', value: function takeAwayLib(coord, lib, takerCol) {
@@ -322,17 +366,17 @@ board = (function () {
     function killGroup(p, takerCol) {
       var pidx = p.index();
       var ch = this.chains.get(pidx);
-      this.chains['delete'](pidx);var _iteratorNormalCompletion11 = true;var _didIteratorError11 = false;var _iteratorError11 = undefined;try {
-        for (var _iterator11 = ch.stones.set[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {var fidx = _step11.value;
-          var f = coord.fromIndex(fidx);var _iteratorNormalCompletion12 = true;var _didIteratorError12 = false;var _iteratorError12 = undefined;try {
-            for (var _iterator12 = f.neighbours()[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {var n = _step12.value;
+      this.chains['delete'](pidx);var _iteratorNormalCompletion12 = true;var _didIteratorError12 = false;var _iteratorError12 = undefined;try {
+        for (var _iterator12 = ch.stones.set[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {var fidx = _step12.value;
+          var f = coord.fromIndex(fidx);var _iteratorNormalCompletion13 = true;var _didIteratorError13 = false;var _iteratorError13 = undefined;try {
+            for (var _iterator13 = f.neighbours()[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {var n = _step13.value;
               if (this.fieldAt(n) === takerCol) {
                 var np = this.ufLookup(n);
                 var och = this.chains.get(np.index());
                 assert(och);
-                och.addLib(f);}}} catch (err) {_didIteratorError12 = true;_iteratorError12 = err;} finally {try {if (!_iteratorNormalCompletion12 && _iterator12['return']) {_iterator12['return']();}} finally {if (_didIteratorError12) {throw _iteratorError12;}}}
+                och.addLib(f);}}} catch (err) {_didIteratorError13 = true;_iteratorError13 = err;} finally {try {if (!_iteratorNormalCompletion13 && _iterator13['return']) {_iterator13['return']();}} finally {if (_didIteratorError13) {throw _iteratorError13;}}}
           this.fields[f.index()] = empty;
-          this.parents['delete'](fidx);}} catch (err) {_didIteratorError11 = true;_iteratorError11 = err;} finally {try {if (!_iteratorNormalCompletion11 && _iterator11['return']) {_iterator11['return']();}} finally {if (_didIteratorError11) {throw _iteratorError11;}}}} }, { key: 'toString', value: 
+          this.parents['delete'](fidx);}} catch (err) {_didIteratorError12 = true;_iteratorError12 = err;} finally {try {if (!_iteratorNormalCompletion12 && _iterator12['return']) {_iterator12['return']();}} finally {if (_didIteratorError12) {throw _iteratorError12;}}}} }, { key: 'toString', value: 
 
     function toString() {
       var p = '      ';
@@ -350,7 +394,8 @@ board = (function () {
           line.push(' ');
           var t = this.fields[new coord(x, y).index()];
           assert(t === black || t === white || t === empty);
-          line.push(['○', '●', ' '][t]);}
+          var emp = markedField(x, y) ? '·' : ' ';
+          line.push(['○', '●', emp][t]);}
 
         line.push('|| ' + twoDigits(y + 1));
         lines.push(line.join(''));}
@@ -366,6 +411,10 @@ board = (function () {
         if (col != empty) {
           f(col, coord.fromIndex(i));}}} }]);return board;})();exports.board = board;
 
+
+function markedField(x, y) {
+  return (x == 3 || x == S - 1 - 3 || x == 9) && (
+  y == 3 || y == S - 1 - 3 || y == 9);}
 
 function testBoard1() {
   var b = new board();
