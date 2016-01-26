@@ -1,4 +1,4 @@
-'use strict';Object.defineProperty(exports, '__esModule', { value: true });var _createClass = (function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};})();exports.testCoord = testCoord;exports.assertIsColor = assertIsColor;exports.otherColor = otherColor;exports.runAllTests = runAllTests;function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError('Cannot call a class as a function');}}var assert = require('assert');
+'use strict';Object.defineProperty(exports, '__esModule', { value: true });var _createClass = (function () {function defineProperties(target, props) {for (var i = 0; i < props.length; i++) {var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ('value' in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);}}return function (Constructor, protoProps, staticProps) {if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;};})();exports.coordSetToString = coordSetToString;exports.coordArrayToString = coordArrayToString;exports.testCoord = testCoord;exports.assertIsColor = assertIsColor;exports.otherColor = otherColor;exports.runAllTests = runAllTests;function _classCallCheck(instance, Constructor) {if (!(instance instanceof Constructor)) {throw new TypeError('Cannot call a class as a function');}}var assert = require('assert');
 
 var S = 19;exports.S = S;
 var S2 = S * S;exports.S2 = S2;
@@ -10,15 +10,7 @@ coord = (function () {
     assert(x >= 0 && x < S);
     assert(y >= 0 && y < S);
     this.xc = x;
-    this.yc = y;}_createClass(coord, [{ key: 'isCoord', value: 
-    function isCoord() {return true;} }, { key: 'x', value: 
-    function x() {return this.xc;} }, { key: 'y', value: 
-    function y() {return this.yc;} }, { key: 'equals', value: 
-    function equals(o) {
-      return this.xc == o.xc && 
-      this.yc == o.yc;} }, { key: 'index', value: 
-    function index() {
-      return S * this.yc + this.xc;} }, { key: 'neighbours', value: 
+    this.yc = y;}
 
 
 
@@ -26,65 +18,89 @@ coord = (function () {
 
 
 
-    function neighbours() {
-      var res = [];
-      if (this.xc >= 1) 
-      res.push(new coord(this.xc - 1, this.yc));
-      if (this.xc < S - 1) 
-      res.push(new coord(this.xc + 1, this.yc));
-      if (this.yc >= 1) 
-      res.push(new coord(this.xc, this.yc - 1));
-      if (this.yc < S - 1) 
-      res.push(new coord(this.xc, this.yc + 1));
-      return res;} }, { key: 'diagonalNeighbours', value: 
-    function diagonalNeighbours() {
-      var res = [];
-      var xc = this.xc;
-      var yc = this.yc;
-      function p(dx, dy) {
-        var x = xc + dx;
-        var y = yc + dy;
-        if (x >= 0 && x < S && y >= 0 && y < S) 
-        res.push(new coord(x, y));}
-      p(-1, -1);
-      p(1, -1);
-      p(1, 1);
-      p(-1, 1);
-      return res;} }, { key: 'displace', value: 
 
-    function displace(dx, dy) {
-      var x = this.xc + dx;
-      var y = this.yc + dy;
-      if (x >= 0 && x < S && y >= 0 && y < S) 
-      return new coord(x, y);else 
 
-      return null;} }, { key: 'toString', value: 
 
-    function toString() {
-      return go_xcoords[this.xc] + (this.yc + 1);} }], [{ key: 'fromIndex', value: function fromIndex(i) {return new coord(i % S, Math.floor(i / S));} }, { key: 'fromName', value: function fromName(nm) {var x = go_xcoords.indexOf(nm[0]);assert(x >= 0);var y = parseInt(nm.slice(1)) - 1;return new coord(x, y);} }]);return coord;})();exports.coord = coord;var 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // This function expects an ordinary Set of coord indices...
+  _createClass(coord, [{ key: 'isCoord', value: function isCoord() {return true;} }, { key: 'x', value: function x() {return this.xc;} }, { key: 'y', value: function y() {return this.yc;} }, { key: 'equals', value: function equals(o) {return this.xc == o.xc && this.yc == o.yc;} }, { key: 'index', value: function index() {return S * this.yc + this.xc;} }, { key: 'neighbours', value: function neighbours() {var res = [];if (this.xc >= 1) res.push(new coord(this.xc - 1, this.yc));if (this.xc < S - 1) res.push(new coord(this.xc + 1, this.yc));if (this.yc >= 1) res.push(new coord(this.xc, this.yc - 1));if (this.yc < S - 1) res.push(new coord(this.xc, this.yc + 1));return res;} }, { key: 'diagonalNeighbours', value: function diagonalNeighbours() {var res = [];var xc = this.xc;var yc = this.yc;function p(dx, dy) {var x = xc + dx;var y = yc + dy;if (x >= 0 && x < S && y >= 0 && y < S) res.push(new coord(x, y));}p(-1, -1);p(1, -1);p(1, 1);p(-1, 1);return res;} }, { key: 'displace', value: function displace(dx, dy) {var x = this.xc + dx;var y = this.yc + dy;if (x >= 0 && x < S && y >= 0 && y < S) return new coord(x, y);else return null;} }, { key: 'toString', value: function toString() {return go_xcoords[this.xc] + (this.yc + 1);} }], [{ key: 'fromIndex', value: function fromIndex(i) {return new coord(i % S, Math.floor(i / S));} }, { key: 'fromName', value: function fromName(nm) {var x = go_xcoords.indexOf(nm[0]);assert(x >= 0);var y = parseInt(nm.slice(1)) - 1;return new coord(x, y);} }]);return coord;})();exports.coord = coord;function coordSetToString(set) {
+  var ary = Array.from(set);
+  ary.sort();
+  var res = [];var _iteratorNormalCompletion = true;var _didIteratorError = false;var _iteratorError = undefined;try {
+    for (var _iterator = ary[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {var e = _step.value;
+      res.push(coord.fromIndex(e).toString());}} catch (err) {_didIteratorError = true;_iteratorError = err;} finally {try {if (!_iteratorNormalCompletion && _iterator['return']) {_iterator['return']();}} finally {if (_didIteratorError) {throw _iteratorError;}}}
+  return res.join(', ');}
+
+function coordArrayToString(ary) {
+  var res = [];var _iteratorNormalCompletion2 = true;var _didIteratorError2 = false;var _iteratorError2 = undefined;try {
+    for (var _iterator2 = ary[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {var e = _step2.value;
+      res.push(e.toString());}} catch (err) {_didIteratorError2 = true;_iteratorError2 = err;} finally {try {if (!_iteratorNormalCompletion2 && _iterator2['return']) {_iterator2['return']();}} finally {if (_didIteratorError2) {throw _iteratorError2;}}}
+  return res.join(', ');}var 
 
 
 coordSet = (function () {
   function coordSet(coords) {_classCallCheck(this, coordSet);
-    this.set = new Set();var _iteratorNormalCompletion = true;var _didIteratorError = false;var _iteratorError = undefined;try {
-      for (var _iterator = coords[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {var c = _step.value;
+    this.set = new Set();var _iteratorNormalCompletion3 = true;var _didIteratorError3 = false;var _iteratorError3 = undefined;try {
+      for (var _iterator3 = coords[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {var c = _step3.value;
         assert(c.isCoord());
-        this.set.add(c.index());}} catch (err) {_didIteratorError = true;_iteratorError = err;} finally {try {if (!_iteratorNormalCompletion && _iterator['return']) {_iterator['return']();}} finally {if (_didIteratorError) {throw _iteratorError;}}}}_createClass(coordSet, [{ key: 'clone', value: 
+        this.set.add(c.index());}} catch (err) {_didIteratorError3 = true;_iteratorError3 = err;} finally {try {if (!_iteratorNormalCompletion3 && _iterator3['return']) {_iterator3['return']();}} finally {if (_didIteratorError3) {throw _iteratorError3;}}}}_createClass(coordSet, [{ key: 'clone', value: 
 
     function clone() {
-      var res = new coordSet([]);var _iteratorNormalCompletion2 = true;var _didIteratorError2 = false;var _iteratorError2 = undefined;try {
-        for (var _iterator2 = this.set[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {var ci = _step2.value;
-          res.set.add(ci);}} catch (err) {_didIteratorError2 = true;_iteratorError2 = err;} finally {try {if (!_iteratorNormalCompletion2 && _iterator2['return']) {_iterator2['return']();}} finally {if (_didIteratorError2) {throw _iteratorError2;}}}
+      var res = new coordSet([]);var _iteratorNormalCompletion4 = true;var _didIteratorError4 = false;var _iteratorError4 = undefined;try {
+        for (var _iterator4 = this.set[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {var ci = _step4.value;
+          res.set.add(ci);}} catch (err) {_didIteratorError4 = true;_iteratorError4 = err;} finally {try {if (!_iteratorNormalCompletion4 && _iterator4['return']) {_iterator4['return']();}} finally {if (_didIteratorError4) {throw _iteratorError4;}}}
       return res;} }, { key: 'equals', value: 
 
-    function equals(other) {var _iteratorNormalCompletion3 = true;var _didIteratorError3 = false;var _iteratorError3 = undefined;try {
-        for (var _iterator3 = other.set[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {var x = _step3.value;
+    function equals(other) {var _iteratorNormalCompletion5 = true;var _didIteratorError5 = false;var _iteratorError5 = undefined;try {
+        for (var _iterator5 = other.set[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {var x = _step5.value;
           if (!this.set.has(x)) 
-          return false;}} catch (err) {_didIteratorError3 = true;_iteratorError3 = err;} finally {try {if (!_iteratorNormalCompletion3 && _iterator3['return']) {_iterator3['return']();}} finally {if (_didIteratorError3) {throw _iteratorError3;}}}var _iteratorNormalCompletion4 = true;var _didIteratorError4 = false;var _iteratorError4 = undefined;try {
-        for (var _iterator4 = this.set[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {var x = _step4.value;
+          return false;}} catch (err) {_didIteratorError5 = true;_iteratorError5 = err;} finally {try {if (!_iteratorNormalCompletion5 && _iterator5['return']) {_iterator5['return']();}} finally {if (_didIteratorError5) {throw _iteratorError5;}}}var _iteratorNormalCompletion6 = true;var _didIteratorError6 = false;var _iteratorError6 = undefined;try {
+        for (var _iterator6 = this.set[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {var x = _step6.value;
           if (!other.set.has(x)) 
-          return false;}} catch (err) {_didIteratorError4 = true;_iteratorError4 = err;} finally {try {if (!_iteratorNormalCompletion4 && _iterator4['return']) {_iterator4['return']();}} finally {if (_didIteratorError4) {throw _iteratorError4;}}}
+          return false;}} catch (err) {_didIteratorError6 = true;_iteratorError6 = err;} finally {try {if (!_iteratorNormalCompletion6 && _iterator6['return']) {_iterator6['return']();}} finally {if (_didIteratorError6) {throw _iteratorError6;}}}
       return true;} }, { key: 'toString', value: 
     function toString() {
       var xs = Array.
@@ -158,11 +174,11 @@ chain = (function () {
       return this.libs.size();} }, { key: 'isDead', value: 
     function isDead() {
       return this.numLibs() == 0;} }, { key: 'addFrom', value: 
-    function addFrom(ch) {var _iteratorNormalCompletion5 = true;var _didIteratorError5 = false;var _iteratorError5 = undefined;try {
-        for (var _iterator5 = ch.stones.set[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {var s = _step5.value;
-          this.stones.add(s);}} catch (err) {_didIteratorError5 = true;_iteratorError5 = err;} finally {try {if (!_iteratorNormalCompletion5 && _iterator5['return']) {_iterator5['return']();}} finally {if (_didIteratorError5) {throw _iteratorError5;}}}var _iteratorNormalCompletion6 = true;var _didIteratorError6 = false;var _iteratorError6 = undefined;try {
-        for (var _iterator6 = ch.libs.set[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {var l = _step6.value;
-          this.libs.add(l);}} catch (err) {_didIteratorError6 = true;_iteratorError6 = err;} finally {try {if (!_iteratorNormalCompletion6 && _iterator6['return']) {_iterator6['return']();}} finally {if (_didIteratorError6) {throw _iteratorError6;}}}} }, { key: 'takeAwayLib', value: 
+    function addFrom(ch) {var _iteratorNormalCompletion7 = true;var _didIteratorError7 = false;var _iteratorError7 = undefined;try {
+        for (var _iterator7 = ch.stones.set[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {var s = _step7.value;
+          this.stones.add(s);}} catch (err) {_didIteratorError7 = true;_iteratorError7 = err;} finally {try {if (!_iteratorNormalCompletion7 && _iterator7['return']) {_iterator7['return']();}} finally {if (_didIteratorError7) {throw _iteratorError7;}}}var _iteratorNormalCompletion8 = true;var _didIteratorError8 = false;var _iteratorError8 = undefined;try {
+        for (var _iterator8 = ch.libs.set[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {var l = _step8.value;
+          this.libs.add(l);}} catch (err) {_didIteratorError8 = true;_iteratorError8 = err;} finally {try {if (!_iteratorNormalCompletion8 && _iterator8['return']) {_iterator8['return']();}} finally {if (_didIteratorError8) {throw _iteratorError8;}}}} }, { key: 'takeAwayLib', value: 
     function takeAwayLib(lib) {
       this.libs['delete'](lib.index());} }, { key: 'addLib', value: 
     function addLib(lib) {
@@ -239,9 +255,9 @@ board = (function () {
       var res = new board();
       res.fields = new Int8Array(this.fields);
       res.parents = new Map(this.parents);
-      res.chains = new Map();var _iteratorNormalCompletion7 = true;var _didIteratorError7 = false;var _iteratorError7 = undefined;try {
-        for (var _iterator7 = this.chains.keys()[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {var co = _step7.value;
-          res.chains.set(co, this.chains.get(co).clone());}} catch (err) {_didIteratorError7 = true;_iteratorError7 = err;} finally {try {if (!_iteratorNormalCompletion7 && _iterator7['return']) {_iterator7['return']();}} finally {if (_didIteratorError7) {throw _iteratorError7;}}}
+      res.chains = new Map();var _iteratorNormalCompletion9 = true;var _didIteratorError9 = false;var _iteratorError9 = undefined;try {
+        for (var _iterator9 = this.chains.keys()[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {var co = _step9.value;
+          res.chains.set(co, this.chains.get(co).clone());}} catch (err) {_didIteratorError9 = true;_iteratorError9 = err;} finally {try {if (!_iteratorNormalCompletion9 && _iterator9['return']) {_iterator9['return']();}} finally {if (_didIteratorError9) {throw _iteratorError9;}}}
       return res;} }, { key: 'canPlace', value: 
 
     function canPlace(col, co) {
@@ -250,8 +266,8 @@ board = (function () {
       var coidx = co.index();
       if (this.fields[coidx] != empty) 
       return false;
-      var ocol = otherColor(col);var _iteratorNormalCompletion8 = true;var _didIteratorError8 = false;var _iteratorError8 = undefined;try {
-        for (var _iterator8 = co.neighbours()[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {var n = _step8.value;
+      var ocol = otherColor(col);var _iteratorNormalCompletion10 = true;var _didIteratorError10 = false;var _iteratorError10 = undefined;try {
+        for (var _iterator10 = co.neighbours()[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {var n = _step10.value;
           var f = this.fields[n.index()];
           if (f === empty) 
           return true;
@@ -259,8 +275,34 @@ board = (function () {
           if (f === col && nl > 1) 
           return true;
           if (f === ocol && nl === 1) 
-          return true;}} catch (err) {_didIteratorError8 = true;_iteratorError8 = err;} finally {try {if (!_iteratorNormalCompletion8 && _iterator8['return']) {_iterator8['return']();}} finally {if (_didIteratorError8) {throw _iteratorError8;}}}
-      return false;} }, { key: 'place', value: 
+          return true;}} catch (err) {_didIteratorError10 = true;_iteratorError10 = err;} finally {try {if (!_iteratorNormalCompletion10 && _iterator10['return']) {_iterator10['return']();}} finally {if (_didIteratorError10) {throw _iteratorError10;}}}
+      return false;} }, { key: 'isKoMove', value: 
+
+    function isKoMove(col, co) {
+      assertIsColor(col);
+      assert(co.isCoord());
+      var coidx = co.index();
+      assert(this.fields[coidx] === empty);
+      var ocol = otherColor(col);
+      var numKilled = 0;
+      var numMine = 0;var _iteratorNormalCompletion11 = true;var _didIteratorError11 = false;var _iteratorError11 = undefined;try {
+        for (var _iterator11 = co.neighbours()[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {var n = _step11.value;
+          var f = this.fields[n.index()];
+          if (f === empty) 
+          return false;
+          if (f === col) 
+          return false;
+          if (f === ocol) {
+            var nl = this.numLibsAt(n);
+            if (nl === 1) {
+              var ns = this.numStonesAt(n);
+              if (ns === 1) {
+                numKilled++;
+                if (numKilled >= 2) 
+                return false;} else 
+              if (ns > 1) 
+              return false;}}}} catch (err) {_didIteratorError11 = true;_iteratorError11 = err;} finally {try {if (!_iteratorNormalCompletion11 && _iterator11['return']) {_iterator11['return']();}} finally {if (_didIteratorError11) {throw _iteratorError11;}}}
+      return numKilled === 1;} }, { key: 'place', value: 
 
     function place(col, co) {
       assertIsColor(col);
@@ -273,17 +315,34 @@ board = (function () {
       this.fields[coidx] = col;
 
       var ch = new chain(co, this.freeFieldsAround(co));
-      this.chains.set(co.index(), ch);var _iteratorNormalCompletion9 = true;var _didIteratorError9 = false;var _iteratorError9 = undefined;try {
+      this.chains.set(co.index(), ch);var _iteratorNormalCompletion12 = true;var _didIteratorError12 = false;var _iteratorError12 = undefined;try {
 
-        for (var _iterator9 = co.neighbours()[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {var n = _step9.value;
+        for (var _iterator12 = co.neighbours()[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {var n = _step12.value;
           if (this.fieldAt(n) !== empty) 
-          this.takeAwayLib(n, co, col);}} catch (err) {_didIteratorError9 = true;_iteratorError9 = err;} finally {try {if (!_iteratorNormalCompletion9 && _iterator9['return']) {_iterator9['return']();}} finally {if (_didIteratorError9) {throw _iteratorError9;}}}var _iteratorNormalCompletion10 = true;var _didIteratorError10 = false;var _iteratorError10 = undefined;try {
+          this.takeAwayLib(n, co, col);}} catch (err) {_didIteratorError12 = true;_iteratorError12 = err;} finally {try {if (!_iteratorNormalCompletion12 && _iterator12['return']) {_iterator12['return']();}} finally {if (_didIteratorError12) {throw _iteratorError12;}}}var _iteratorNormalCompletion13 = true;var _didIteratorError13 = false;var _iteratorError13 = undefined;try {
 
-        for (var _iterator10 = co.neighbours()[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {var n = _step10.value;
+        for (var _iterator13 = co.neighbours()[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {var n = _step13.value;
           if (this.fieldAt(n) === col) {
-            this.ufAdd(n, co);}}} catch (err) {_didIteratorError10 = true;_iteratorError10 = err;} finally {try {if (!_iteratorNormalCompletion10 && _iterator10['return']) {_iterator10['return']();}} finally {if (_didIteratorError10) {throw _iteratorError10;}}}
+            this.ufAdd(n, co);}}} catch (err) {_didIteratorError13 = true;_iteratorError13 = err;} finally {try {if (!_iteratorNormalCompletion13 && _iterator13['return']) {_iterator13['return']();}} finally {if (_didIteratorError13) {throw _iteratorError13;}}}
 
-      return true;} }, { key: 'ufAdd', value: 
+      return true;} }, { key: 'stonesKilledByPlacing', value: 
+
+    function stonesKilledByPlacing(col, co) {
+      assertIsColor(col);
+      assert(co.isCoord());
+      var coidx = co.index();
+      if (this.fields[coidx] != empty) 
+      return null;
+      var ocol = otherColor(col);
+      var res = null;var _iteratorNormalCompletion14 = true;var _didIteratorError14 = false;var _iteratorError14 = undefined;try {
+        for (var _iterator14 = co.neighbours()[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {var n = _step14.value;
+          var f = this.fields[n.index()];
+          if (f === ocol && this.numLibsAt(n) === 1) {
+            if (res === null) 
+            res = new Set();var _iteratorNormalCompletion15 = true;var _didIteratorError15 = false;var _iteratorError15 = undefined;try {
+              for (var _iterator15 = this.stonesOfChainAt(n)[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {var sidx = _step15.value;
+                res.add(sidx);}} catch (err) {_didIteratorError15 = true;_iteratorError15 = err;} finally {try {if (!_iteratorNormalCompletion15 && _iterator15['return']) {_iterator15['return']();}} finally {if (_didIteratorError15) {throw _iteratorError15;}}}}}} catch (err) {_didIteratorError14 = true;_iteratorError14 = err;} finally {try {if (!_iteratorNormalCompletion14 && _iterator14['return']) {_iterator14['return']();}} finally {if (_didIteratorError14) {throw _iteratorError14;}}}
+      return res;} }, { key: 'ufAdd', value: 
 
     function ufAdd(a, b) {
       var ap = this.ufLookup(a);
@@ -318,10 +377,10 @@ board = (function () {
       return this.fieldAt(co) === col;} }, { key: 'freeFieldsAround', value: 
 
     function freeFieldsAround(co) {
-      var res = [];var _iteratorNormalCompletion11 = true;var _didIteratorError11 = false;var _iteratorError11 = undefined;try {
-        for (var _iterator11 = co.neighbours()[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {var n = _step11.value;
+      var res = [];var _iteratorNormalCompletion16 = true;var _didIteratorError16 = false;var _iteratorError16 = undefined;try {
+        for (var _iterator16 = co.neighbours()[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {var n = _step16.value;
           if (this.isEmptyAt(n)) 
-          res.push(n);}} catch (err) {_didIteratorError11 = true;_iteratorError11 = err;} finally {try {if (!_iteratorNormalCompletion11 && _iterator11['return']) {_iterator11['return']();}} finally {if (_didIteratorError11) {throw _iteratorError11;}}}
+          res.push(n);}} catch (err) {_didIteratorError16 = true;_iteratorError16 = err;} finally {try {if (!_iteratorNormalCompletion16 && _iterator16['return']) {_iterator16['return']();}} finally {if (_didIteratorError16) {throw _iteratorError16;}}}
       return res;}
 
     // union-find
@@ -366,17 +425,17 @@ board = (function () {
     function killGroup(p, takerCol) {
       var pidx = p.index();
       var ch = this.chains.get(pidx);
-      this.chains['delete'](pidx);var _iteratorNormalCompletion12 = true;var _didIteratorError12 = false;var _iteratorError12 = undefined;try {
-        for (var _iterator12 = ch.stones.set[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {var fidx = _step12.value;
-          var f = coord.fromIndex(fidx);var _iteratorNormalCompletion13 = true;var _didIteratorError13 = false;var _iteratorError13 = undefined;try {
-            for (var _iterator13 = f.neighbours()[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {var n = _step13.value;
+      this.chains['delete'](pidx);var _iteratorNormalCompletion17 = true;var _didIteratorError17 = false;var _iteratorError17 = undefined;try {
+        for (var _iterator17 = ch.stones.set[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {var fidx = _step17.value;
+          var f = coord.fromIndex(fidx);var _iteratorNormalCompletion18 = true;var _didIteratorError18 = false;var _iteratorError18 = undefined;try {
+            for (var _iterator18 = f.neighbours()[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {var n = _step18.value;
               if (this.fieldAt(n) === takerCol) {
                 var np = this.ufLookup(n);
                 var och = this.chains.get(np.index());
                 assert(och);
-                och.addLib(f);}}} catch (err) {_didIteratorError13 = true;_iteratorError13 = err;} finally {try {if (!_iteratorNormalCompletion13 && _iterator13['return']) {_iterator13['return']();}} finally {if (_didIteratorError13) {throw _iteratorError13;}}}
+                och.addLib(f);}}} catch (err) {_didIteratorError18 = true;_iteratorError18 = err;} finally {try {if (!_iteratorNormalCompletion18 && _iterator18['return']) {_iterator18['return']();}} finally {if (_didIteratorError18) {throw _iteratorError18;}}}
           this.fields[f.index()] = empty;
-          this.parents['delete'](fidx);}} catch (err) {_didIteratorError12 = true;_iteratorError12 = err;} finally {try {if (!_iteratorNormalCompletion12 && _iterator12['return']) {_iterator12['return']();}} finally {if (_didIteratorError12) {throw _iteratorError12;}}}} }, { key: 'toString', value: 
+          this.parents['delete'](fidx);}} catch (err) {_didIteratorError17 = true;_iteratorError17 = err;} finally {try {if (!_iteratorNormalCompletion17 && _iterator17['return']) {_iterator17['return']();}} finally {if (_didIteratorError17) {throw _iteratorError17;}}}} }, { key: 'toString', value: 
 
     function toString() {
       var p = '      ';
@@ -474,6 +533,20 @@ function testBoard2() {
   // console.log(b.toString())
 }
 
+function testBoard3() {
+  var b = new board();var _iteratorNormalCompletion19 = true;var _didIteratorError19 = false;var _iteratorError19 = undefined;try {
+    for (var _iterator19 = 'B1,D1,A2,D2,A3,B3,C3,D3'.split(',')[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {var c = _step19.value;
+      b.place(black, coord.fromName(c));}} catch (err) {_didIteratorError19 = true;_iteratorError19 = err;} finally {try {if (!_iteratorNormalCompletion19 && _iterator19['return']) {_iterator19['return']();}} finally {if (_didIteratorError19) {throw _iteratorError19;}}}var _iteratorNormalCompletion20 = true;var _didIteratorError20 = false;var _iteratorError20 = undefined;try {
+    for (var _iterator20 = 'B2,C2,E1,E2,E3,E4,D4,C4,B4,A4'.split(',')[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {var c = _step20.value;
+      b.place(white, coord.fromName(c));}} catch (err) {_didIteratorError20 = true;_iteratorError20 = err;} finally {try {if (!_iteratorNormalCompletion20 && _iterator20['return']) {_iterator20['return']();}} finally {if (_didIteratorError20) {throw _iteratorError20;}}}
+
+  console.log(b.toString());
+
+  assert(b.canPlace(black, coord.fromName('A1')));
+  assert(b.canPlace(black, coord.fromName('C1')));}
+
+
+
 function testBoardClone() {
   var b = new board();
   b.place(black, coord.fromName('C1'));
@@ -488,6 +561,7 @@ function runAllTests() {
   testBoard1();
   testBoard2();
   testBoardClone();
+  testBoard3();
   console.log('board tests ok');}
 
 

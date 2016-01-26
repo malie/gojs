@@ -65,6 +65,22 @@ export class coord {
 }
 
 
+// This function expects an ordinary Set of coord indices...
+export function coordSetToString(set) {
+  var ary = Array.from(set)
+  ary.sort()
+  var res = []
+  for (var e of ary)
+    res.push(coord.fromIndex(e).toString())
+  return res.join(', ')}
+
+export function coordArrayToString(ary) {
+  var res = []
+  for (var e of ary)
+    res.push(e.toString())
+  return res.join(', ')}
+
+
 class coordSet {
   constructor(coords) {
     this.set = new Set()
@@ -261,6 +277,32 @@ export class board {
       if (f === ocol && nl === 1)
 	return true}
     return false}
+
+  isKoMove(col, co) {
+    assertIsColor(col)
+    assert(co.isCoord())
+    let coidx = co.index()
+    assert(this.fields[coidx] === empty)
+    let ocol = otherColor(col)
+    let numKilled = 0
+    let numMine = 0
+    for (var n of co.neighbours()) {
+      let f = this.fields[n.index()]
+      if (f === empty)
+	return false
+      if (f === col)
+	return false
+      if (f === ocol) {
+	var nl = this.numLibsAt(n)
+	if (nl === 1) {
+	  var ns = this.numStonesAt(n)
+	  if (ns === 1) {
+	    numKilled++
+	    if (numKilled >= 2)
+	      return false}
+	  else if (ns > 1)
+	    return false}}}
+    return numKilled === 1}
   
   place(col, co) {
     assertIsColor(col)
@@ -285,6 +327,23 @@ export class board {
 
     return true}
 
+  stonesKilledByPlacing(col, co) {
+    assertIsColor(col)
+    assert(co.isCoord())
+    let coidx = co.index()
+    if (this.fields[coidx] != empty)
+      return null
+    let ocol = otherColor(col)
+    var res = null
+    for (var n of co.neighbours()) {
+      let f = this.fields[n.index()]
+      if (f === ocol && this.numLibsAt(n) === 1) {
+	if (res === null)
+	  res = new Set()
+	for (var sidx of this.stonesOfChainAt(n))
+	  res.add(sidx)}}
+    return res}
+  
   ufAdd(a, b) {
     let ap = this.ufLookup(a)
     let bp = this.ufLookup(b)
@@ -474,6 +533,20 @@ function testBoard2() {
   // console.log(b.toString())
 }
 
+function testBoard3() {
+  let b = new board()
+  for (var c of 'B1,D1,A2,D2,A3,B3,C3,D3'.split(','))
+    b.place(black, coord.fromName(c))
+  for (var c of 'B2,C2,E1,E2,E3,E4,D4,C4,B4,A4'.split(','))
+    b.place(white, coord.fromName(c))
+
+  console.log(b.toString())
+
+  assert(b.canPlace(black, coord.fromName('A1')))
+  assert(b.canPlace(black, coord.fromName('C1')))
+}
+
+
 function testBoardClone() {
   let b = new board()
   b.place(black, coord.fromName('C1'))
@@ -488,6 +561,7 @@ export function runAllTests() {
   testBoard1()
   testBoard2()
   testBoardClone()
+  testBoard3()
   console.log('board tests ok')
 }
 
