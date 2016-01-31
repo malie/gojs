@@ -15,7 +15,8 @@ export class coord {
   x() { return this.xc }
   y() { return this.yc }
   equals(o) {
-    return (this.xc == o.xc
+    return (o !== null
+	    && this.xc == o.xc
 	    && this.yc == o.yc)}
   index() {
     return S*this.yc + this.xc}
@@ -408,6 +409,9 @@ export class board {
 
   numStonesAt(co) {
     return this.chainAt(co).numStones()}
+
+  libsOfChainAt(co) {
+    return this.chainAt(co).libs.set}
 
   stonesOfChainAt(co) {
     return this.chainAt(co).stones.set}

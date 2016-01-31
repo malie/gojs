@@ -65,8 +65,9 @@ coord = (function () {
 
 
 
+
   // This function expects an ordinary Set of coord indices...
-  _createClass(coord, [{ key: 'isCoord', value: function isCoord() {return true;} }, { key: 'x', value: function x() {return this.xc;} }, { key: 'y', value: function y() {return this.yc;} }, { key: 'equals', value: function equals(o) {return this.xc == o.xc && this.yc == o.yc;} }, { key: 'index', value: function index() {return S * this.yc + this.xc;} }, { key: 'neighbours', value: function neighbours() {var res = [];if (this.xc >= 1) res.push(new coord(this.xc - 1, this.yc));if (this.xc < S - 1) res.push(new coord(this.xc + 1, this.yc));if (this.yc >= 1) res.push(new coord(this.xc, this.yc - 1));if (this.yc < S - 1) res.push(new coord(this.xc, this.yc + 1));return res;} }, { key: 'diagonalNeighbours', value: function diagonalNeighbours() {var res = [];var xc = this.xc;var yc = this.yc;function p(dx, dy) {var x = xc + dx;var y = yc + dy;if (x >= 0 && x < S && y >= 0 && y < S) res.push(new coord(x, y));}p(-1, -1);p(1, -1);p(1, 1);p(-1, 1);return res;} }, { key: 'displace', value: function displace(dx, dy) {var x = this.xc + dx;var y = this.yc + dy;if (x >= 0 && x < S && y >= 0 && y < S) return new coord(x, y);else return null;} }, { key: 'toString', value: function toString() {return go_xcoords[this.xc] + (this.yc + 1);} }], [{ key: 'fromIndex', value: function fromIndex(i) {return new coord(i % S, Math.floor(i / S));} }, { key: 'fromName', value: function fromName(nm) {var x = go_xcoords.indexOf(nm[0]);assert(x >= 0);var y = parseInt(nm.slice(1)) - 1;return new coord(x, y);} }]);return coord;})();exports.coord = coord;function coordSetToString(set) {
+  _createClass(coord, [{ key: 'isCoord', value: function isCoord() {return true;} }, { key: 'x', value: function x() {return this.xc;} }, { key: 'y', value: function y() {return this.yc;} }, { key: 'equals', value: function equals(o) {return o !== null && this.xc == o.xc && this.yc == o.yc;} }, { key: 'index', value: function index() {return S * this.yc + this.xc;} }, { key: 'neighbours', value: function neighbours() {var res = [];if (this.xc >= 1) res.push(new coord(this.xc - 1, this.yc));if (this.xc < S - 1) res.push(new coord(this.xc + 1, this.yc));if (this.yc >= 1) res.push(new coord(this.xc, this.yc - 1));if (this.yc < S - 1) res.push(new coord(this.xc, this.yc + 1));return res;} }, { key: 'diagonalNeighbours', value: function diagonalNeighbours() {var res = [];var xc = this.xc;var yc = this.yc;function p(dx, dy) {var x = xc + dx;var y = yc + dy;if (x >= 0 && x < S && y >= 0 && y < S) res.push(new coord(x, y));}p(-1, -1);p(1, -1);p(1, 1);p(-1, 1);return res;} }, { key: 'displace', value: function displace(dx, dy) {var x = this.xc + dx;var y = this.yc + dy;if (x >= 0 && x < S && y >= 0 && y < S) return new coord(x, y);else return null;} }, { key: 'toString', value: function toString() {return go_xcoords[this.xc] + (this.yc + 1);} }], [{ key: 'fromIndex', value: function fromIndex(i) {return new coord(i % S, Math.floor(i / S));} }, { key: 'fromName', value: function fromName(nm) {var x = go_xcoords.indexOf(nm[0]);assert(x >= 0);var y = parseInt(nm.slice(1)) - 1;return new coord(x, y);} }]);return coord;})();exports.coord = coord;function coordSetToString(set) {
   var ary = Array.from(set);
   ary.sort();
   var res = [];var _iteratorNormalCompletion = true;var _didIteratorError = false;var _iteratorError = undefined;try {
@@ -407,7 +408,10 @@ board = (function () {
       return this.chainAt(co).numLibs();} }, { key: 'numStonesAt', value: 
 
     function numStonesAt(co) {
-      return this.chainAt(co).numStones();} }, { key: 'stonesOfChainAt', value: 
+      return this.chainAt(co).numStones();} }, { key: 'libsOfChainAt', value: 
+
+    function libsOfChainAt(co) {
+      return this.chainAt(co).libs.set;} }, { key: 'stonesOfChainAt', value: 
 
     function stonesOfChainAt(co) {
       return this.chainAt(co).stones.set;}
