@@ -277,7 +277,48 @@ board = (function () {
           return true;
           if (f === ocol && nl === 1) 
           return true;}} catch (err) {_didIteratorError10 = true;_iteratorError10 = err;} finally {try {if (!_iteratorNormalCompletion10 && _iterator10['return']) {_iterator10['return']();}} finally {if (_didIteratorError10) {throw _iteratorError10;}}}
-      return false;} }, { key: 'isKoMove', value: 
+      return false;} }, { key: 'isSelfAtari', value: 
+
+    function isSelfAtari(col, co) {
+      assertIsColor(col);
+      assert(co.isCoord());
+      var coidx = co.index();
+      if (this.fields[coidx] != empty) 
+      return null;
+      var numEmpty = 0;
+      var ns = co.neighbours();var _iteratorNormalCompletion11 = true;var _didIteratorError11 = false;var _iteratorError11 = undefined;try {
+        for (var _iterator11 = ns[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {var n = _step11.value;
+          if (this.fieldAt(n) == empty) {
+            numEmpty++;
+            if (numEmpty == 2) 
+            return false;}}} catch (err) {_didIteratorError11 = true;_iteratorError11 = err;} finally {try {if (!_iteratorNormalCompletion11 && _iterator11['return']) {_iterator11['return']();}} finally {if (_didIteratorError11) {throw _iteratorError11;}}}var _iteratorNormalCompletion12 = true;var _didIteratorError12 = false;var _iteratorError12 = undefined;try {
+
+        for (var _iterator12 = ns[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {var n = _step12.value;
+          if (this.fieldAt(n) == col && 
+          this.numLibsAt(n) >= 3) 
+          return false;}} catch (err) {_didIteratorError12 = true;_iteratorError12 = err;} finally {try {if (!_iteratorNormalCompletion12 && _iterator12['return']) {_iterator12['return']();}} finally {if (_didIteratorError12) {throw _iteratorError12;}}}
+
+      var libs = new Set();var _iteratorNormalCompletion13 = true;var _didIteratorError13 = false;var _iteratorError13 = undefined;try {
+        for (var _iterator13 = ns[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {var n = _step13.value;
+          if (this.fieldAt(n) == col) {var _iteratorNormalCompletion15 = true;var _didIteratorError15 = false;var _iteratorError15 = undefined;try {
+              for (var _iterator15 = this.libsOfChainAt(n)[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {var l = _step15.value;
+                if (l === coidx) 
+                continue;
+                libs.add(l);
+                if (libs.size >= 2) 
+                return false;}} catch (err) {_didIteratorError15 = true;_iteratorError15 = err;} finally {try {if (!_iteratorNormalCompletion15 && _iterator15['return']) {_iterator15['return']();}} finally {if (_didIteratorError15) {throw _iteratorError15;}}}}}
+
+        // slightly wrong here:
+        //    does not detect some snapbacks
+      } catch (err) {_didIteratorError13 = true;_iteratorError13 = err;} finally {try {if (!_iteratorNormalCompletion13 && _iterator13['return']) {_iterator13['return']();}} finally {if (_didIteratorError13) {throw _iteratorError13;}}}var ocol = otherColor(col);var _iteratorNormalCompletion14 = true;var _didIteratorError14 = false;var _iteratorError14 = undefined;try {
+        for (var _iterator14 = ns[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {var n = _step14.value;
+          if (this.fieldAt(n) === ocol && 
+          this.numLibsAt(n) === 1 && (
+          this.numStonesAt(n) > 2 || 
+          libs.size >= 1)) 
+          return false;}} catch (err) {_didIteratorError14 = true;_iteratorError14 = err;} finally {try {if (!_iteratorNormalCompletion14 && _iterator14['return']) {_iterator14['return']();}} finally {if (_didIteratorError14) {throw _iteratorError14;}}}
+
+      return true;} }, { key: 'isKoMove', value: 
 
     function isKoMove(col, co) {
       assertIsColor(col);
@@ -286,8 +327,8 @@ board = (function () {
       assert(this.fields[coidx] === empty);
       var ocol = otherColor(col);
       var numKilled = 0;
-      var numMine = 0;var _iteratorNormalCompletion11 = true;var _didIteratorError11 = false;var _iteratorError11 = undefined;try {
-        for (var _iterator11 = co.neighbours()[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {var n = _step11.value;
+      var numMine = 0;var _iteratorNormalCompletion16 = true;var _didIteratorError16 = false;var _iteratorError16 = undefined;try {
+        for (var _iterator16 = co.neighbours()[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {var n = _step16.value;
           var f = this.fields[n.index()];
           if (f === empty) 
           return false;
@@ -302,7 +343,7 @@ board = (function () {
                 if (numKilled >= 2) 
                 return false;} else 
               if (ns > 1) 
-              return false;}}}} catch (err) {_didIteratorError11 = true;_iteratorError11 = err;} finally {try {if (!_iteratorNormalCompletion11 && _iterator11['return']) {_iterator11['return']();}} finally {if (_didIteratorError11) {throw _iteratorError11;}}}
+              return false;}}}} catch (err) {_didIteratorError16 = true;_iteratorError16 = err;} finally {try {if (!_iteratorNormalCompletion16 && _iterator16['return']) {_iterator16['return']();}} finally {if (_didIteratorError16) {throw _iteratorError16;}}}
       return numKilled === 1;} }, { key: 'place', value: 
 
     function place(col, co) {
@@ -316,15 +357,15 @@ board = (function () {
       this.fields[coidx] = col;
 
       var ch = new chain(co, this.freeFieldsAround(co));
-      this.chains.set(co.index(), ch);var _iteratorNormalCompletion12 = true;var _didIteratorError12 = false;var _iteratorError12 = undefined;try {
+      this.chains.set(co.index(), ch);var _iteratorNormalCompletion17 = true;var _didIteratorError17 = false;var _iteratorError17 = undefined;try {
 
-        for (var _iterator12 = co.neighbours()[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {var n = _step12.value;
+        for (var _iterator17 = co.neighbours()[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {var n = _step17.value;
           if (this.fieldAt(n) !== empty) 
-          this.takeAwayLib(n, co, col);}} catch (err) {_didIteratorError12 = true;_iteratorError12 = err;} finally {try {if (!_iteratorNormalCompletion12 && _iterator12['return']) {_iterator12['return']();}} finally {if (_didIteratorError12) {throw _iteratorError12;}}}var _iteratorNormalCompletion13 = true;var _didIteratorError13 = false;var _iteratorError13 = undefined;try {
+          this.takeAwayLib(n, co, col);}} catch (err) {_didIteratorError17 = true;_iteratorError17 = err;} finally {try {if (!_iteratorNormalCompletion17 && _iterator17['return']) {_iterator17['return']();}} finally {if (_didIteratorError17) {throw _iteratorError17;}}}var _iteratorNormalCompletion18 = true;var _didIteratorError18 = false;var _iteratorError18 = undefined;try {
 
-        for (var _iterator13 = co.neighbours()[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {var n = _step13.value;
+        for (var _iterator18 = co.neighbours()[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {var n = _step18.value;
           if (this.fieldAt(n) === col) {
-            this.ufAdd(n, co);}}} catch (err) {_didIteratorError13 = true;_iteratorError13 = err;} finally {try {if (!_iteratorNormalCompletion13 && _iterator13['return']) {_iterator13['return']();}} finally {if (_didIteratorError13) {throw _iteratorError13;}}}
+            this.ufAdd(n, co);}}} catch (err) {_didIteratorError18 = true;_iteratorError18 = err;} finally {try {if (!_iteratorNormalCompletion18 && _iterator18['return']) {_iterator18['return']();}} finally {if (_didIteratorError18) {throw _iteratorError18;}}}
 
       return true;} }, { key: 'stonesKilledByPlacing', value: 
 
@@ -335,14 +376,14 @@ board = (function () {
       if (this.fields[coidx] != empty) 
       return null;
       var ocol = otherColor(col);
-      var res = null;var _iteratorNormalCompletion14 = true;var _didIteratorError14 = false;var _iteratorError14 = undefined;try {
-        for (var _iterator14 = co.neighbours()[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {var n = _step14.value;
+      var res = null;var _iteratorNormalCompletion19 = true;var _didIteratorError19 = false;var _iteratorError19 = undefined;try {
+        for (var _iterator19 = co.neighbours()[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {var n = _step19.value;
           var f = this.fields[n.index()];
           if (f === ocol && this.numLibsAt(n) === 1) {
             if (res === null) 
-            res = new Set();var _iteratorNormalCompletion15 = true;var _didIteratorError15 = false;var _iteratorError15 = undefined;try {
-              for (var _iterator15 = this.stonesOfChainAt(n)[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {var sidx = _step15.value;
-                res.add(sidx);}} catch (err) {_didIteratorError15 = true;_iteratorError15 = err;} finally {try {if (!_iteratorNormalCompletion15 && _iterator15['return']) {_iterator15['return']();}} finally {if (_didIteratorError15) {throw _iteratorError15;}}}}}} catch (err) {_didIteratorError14 = true;_iteratorError14 = err;} finally {try {if (!_iteratorNormalCompletion14 && _iterator14['return']) {_iterator14['return']();}} finally {if (_didIteratorError14) {throw _iteratorError14;}}}
+            res = new Set();var _iteratorNormalCompletion20 = true;var _didIteratorError20 = false;var _iteratorError20 = undefined;try {
+              for (var _iterator20 = this.stonesOfChainAt(n)[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {var sidx = _step20.value;
+                res.add(sidx);}} catch (err) {_didIteratorError20 = true;_iteratorError20 = err;} finally {try {if (!_iteratorNormalCompletion20 && _iterator20['return']) {_iterator20['return']();}} finally {if (_didIteratorError20) {throw _iteratorError20;}}}}}} catch (err) {_didIteratorError19 = true;_iteratorError19 = err;} finally {try {if (!_iteratorNormalCompletion19 && _iterator19['return']) {_iterator19['return']();}} finally {if (_didIteratorError19) {throw _iteratorError19;}}}
       return res;} }, { key: 'ufAdd', value: 
 
     function ufAdd(a, b) {
@@ -378,10 +419,10 @@ board = (function () {
       return this.fieldAt(co) === col;} }, { key: 'freeFieldsAround', value: 
 
     function freeFieldsAround(co) {
-      var res = [];var _iteratorNormalCompletion16 = true;var _didIteratorError16 = false;var _iteratorError16 = undefined;try {
-        for (var _iterator16 = co.neighbours()[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {var n = _step16.value;
+      var res = [];var _iteratorNormalCompletion21 = true;var _didIteratorError21 = false;var _iteratorError21 = undefined;try {
+        for (var _iterator21 = co.neighbours()[Symbol.iterator](), _step21; !(_iteratorNormalCompletion21 = (_step21 = _iterator21.next()).done); _iteratorNormalCompletion21 = true) {var n = _step21.value;
           if (this.isEmptyAt(n)) 
-          res.push(n);}} catch (err) {_didIteratorError16 = true;_iteratorError16 = err;} finally {try {if (!_iteratorNormalCompletion16 && _iterator16['return']) {_iterator16['return']();}} finally {if (_didIteratorError16) {throw _iteratorError16;}}}
+          res.push(n);}} catch (err) {_didIteratorError21 = true;_iteratorError21 = err;} finally {try {if (!_iteratorNormalCompletion21 && _iterator21['return']) {_iterator21['return']();}} finally {if (_didIteratorError21) {throw _iteratorError21;}}}
       return res;}
 
     // union-find
@@ -429,17 +470,17 @@ board = (function () {
     function killGroup(p, takerCol) {
       var pidx = p.index();
       var ch = this.chains.get(pidx);
-      this.chains['delete'](pidx);var _iteratorNormalCompletion17 = true;var _didIteratorError17 = false;var _iteratorError17 = undefined;try {
-        for (var _iterator17 = ch.stones.set[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {var fidx = _step17.value;
-          var f = coord.fromIndex(fidx);var _iteratorNormalCompletion18 = true;var _didIteratorError18 = false;var _iteratorError18 = undefined;try {
-            for (var _iterator18 = f.neighbours()[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {var n = _step18.value;
+      this.chains['delete'](pidx);var _iteratorNormalCompletion22 = true;var _didIteratorError22 = false;var _iteratorError22 = undefined;try {
+        for (var _iterator22 = ch.stones.set[Symbol.iterator](), _step22; !(_iteratorNormalCompletion22 = (_step22 = _iterator22.next()).done); _iteratorNormalCompletion22 = true) {var fidx = _step22.value;
+          var f = coord.fromIndex(fidx);var _iteratorNormalCompletion23 = true;var _didIteratorError23 = false;var _iteratorError23 = undefined;try {
+            for (var _iterator23 = f.neighbours()[Symbol.iterator](), _step23; !(_iteratorNormalCompletion23 = (_step23 = _iterator23.next()).done); _iteratorNormalCompletion23 = true) {var n = _step23.value;
               if (this.fieldAt(n) === takerCol) {
                 var np = this.ufLookup(n);
                 var och = this.chains.get(np.index());
                 assert(och);
-                och.addLib(f);}}} catch (err) {_didIteratorError18 = true;_iteratorError18 = err;} finally {try {if (!_iteratorNormalCompletion18 && _iterator18['return']) {_iterator18['return']();}} finally {if (_didIteratorError18) {throw _iteratorError18;}}}
+                och.addLib(f);}}} catch (err) {_didIteratorError23 = true;_iteratorError23 = err;} finally {try {if (!_iteratorNormalCompletion23 && _iterator23['return']) {_iterator23['return']();}} finally {if (_didIteratorError23) {throw _iteratorError23;}}}
           this.fields[f.index()] = empty;
-          this.parents['delete'](fidx);}} catch (err) {_didIteratorError17 = true;_iteratorError17 = err;} finally {try {if (!_iteratorNormalCompletion17 && _iterator17['return']) {_iterator17['return']();}} finally {if (_didIteratorError17) {throw _iteratorError17;}}}} }, { key: 'toString', value: 
+          this.parents['delete'](fidx);}} catch (err) {_didIteratorError22 = true;_iteratorError22 = err;} finally {try {if (!_iteratorNormalCompletion22 && _iterator22['return']) {_iterator22['return']();}} finally {if (_didIteratorError22) {throw _iteratorError22;}}}} }, { key: 'toString', value: 
 
     function toString() {
       var p = '      ';
@@ -538,11 +579,11 @@ function testBoard2() {
 }
 
 function testBoard3() {
-  var b = new board();var _iteratorNormalCompletion19 = true;var _didIteratorError19 = false;var _iteratorError19 = undefined;try {
-    for (var _iterator19 = 'B1,D1,A2,D2,A3,B3,C3,D3'.split(',')[Symbol.iterator](), _step19; !(_iteratorNormalCompletion19 = (_step19 = _iterator19.next()).done); _iteratorNormalCompletion19 = true) {var c = _step19.value;
-      b.place(black, coord.fromName(c));}} catch (err) {_didIteratorError19 = true;_iteratorError19 = err;} finally {try {if (!_iteratorNormalCompletion19 && _iterator19['return']) {_iterator19['return']();}} finally {if (_didIteratorError19) {throw _iteratorError19;}}}var _iteratorNormalCompletion20 = true;var _didIteratorError20 = false;var _iteratorError20 = undefined;try {
-    for (var _iterator20 = 'B2,C2,E1,E2,E3,E4,D4,C4,B4,A4'.split(',')[Symbol.iterator](), _step20; !(_iteratorNormalCompletion20 = (_step20 = _iterator20.next()).done); _iteratorNormalCompletion20 = true) {var c = _step20.value;
-      b.place(white, coord.fromName(c));}} catch (err) {_didIteratorError20 = true;_iteratorError20 = err;} finally {try {if (!_iteratorNormalCompletion20 && _iterator20['return']) {_iterator20['return']();}} finally {if (_didIteratorError20) {throw _iteratorError20;}}}
+  var b = new board();var _iteratorNormalCompletion24 = true;var _didIteratorError24 = false;var _iteratorError24 = undefined;try {
+    for (var _iterator24 = 'B1,D1,A2,D2,A3,B3,C3,D3'.split(',')[Symbol.iterator](), _step24; !(_iteratorNormalCompletion24 = (_step24 = _iterator24.next()).done); _iteratorNormalCompletion24 = true) {var c = _step24.value;
+      b.place(black, coord.fromName(c));}} catch (err) {_didIteratorError24 = true;_iteratorError24 = err;} finally {try {if (!_iteratorNormalCompletion24 && _iterator24['return']) {_iterator24['return']();}} finally {if (_didIteratorError24) {throw _iteratorError24;}}}var _iteratorNormalCompletion25 = true;var _didIteratorError25 = false;var _iteratorError25 = undefined;try {
+    for (var _iterator25 = 'B2,C2,E1,E2,E3,E4,D4,C4,B4,A4'.split(',')[Symbol.iterator](), _step25; !(_iteratorNormalCompletion25 = (_step25 = _iterator25.next()).done); _iteratorNormalCompletion25 = true) {var c = _step25.value;
+      b.place(white, coord.fromName(c));}} catch (err) {_didIteratorError25 = true;_iteratorError25 = err;} finally {try {if (!_iteratorNormalCompletion25 && _iterator25['return']) {_iterator25['return']();}} finally {if (_didIteratorError25) {throw _iteratorError25;}}}
 
   console.log(b.toString());
 

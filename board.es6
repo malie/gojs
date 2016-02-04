@@ -279,6 +279,47 @@ export class board {
 	return true}
     return false}
 
+  isSelfAtari(col, co) {
+    assertIsColor(col)
+    assert(co.isCoord())
+    let coidx = co.index()
+    if (this.fields[coidx] != empty)
+      return null
+    var numEmpty = 0
+    var ns = co.neighbours()
+    for (var n of ns) {
+      if (this.fieldAt(n) == empty) {
+	numEmpty++
+	if (numEmpty==2)
+	  return false}}
+
+    for (var n of ns) {
+      if (this.fieldAt(n) == col
+	  && this.numLibsAt(n) >= 3)
+	return false}
+
+    var libs = new Set()
+    for (var n of ns) {
+      if (this.fieldAt(n) == col) {
+	for (var l of this.libsOfChainAt(n)) {
+	  if (l === coidx)
+	    continue
+	  libs.add(l)
+	  if (libs.size >= 2)
+	    return false}}}
+
+    // slightly wrong here:
+    //    does not detect some snapbacks
+    var ocol = otherColor(col)
+    for (var n of ns) {
+      if (this.fieldAt(n) === ocol
+	  && this.numLibsAt(n) === 1
+	  && (this.numStonesAt(n) > 2
+	      || libs.size >= 1))
+	return false}
+
+    return true}
+
   isKoMove(col, co) {
     assertIsColor(col)
     assert(co.isCoord())
