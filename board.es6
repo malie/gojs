@@ -302,11 +302,16 @@ export class board {
     for (var n of ns) {
       if (this.fieldAt(n) == col) {
 	for (var l of this.libsOfChainAt(n)) {
-	  if (l === coidx)
-	    continue
+	  if (l === coidx) continue
 	  libs.add(l)
 	  if (libs.size >= 2)
 	    return false}}}
+
+    for (var n of ns) {
+      if (this.fieldAt(n) == empty) {
+	libs.add(n.index())
+	if (libs.size >= 2)
+	  return false}}
 
     // slightly wrong here:
     //    does not detect some snapbacks
@@ -314,7 +319,7 @@ export class board {
     for (var n of ns) {
       if (this.fieldAt(n) === ocol
 	  && this.numLibsAt(n) === 1
-	  && (this.numStonesAt(n) > 2
+	  && (this.numStonesAt(n) >= 2
 	      || libs.size >= 1))
 	return false}
 
