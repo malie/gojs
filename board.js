@@ -250,7 +250,13 @@ board = (function () {
     this.chains = new Map();
     // field content
     this.fields = new Int8Array(S2);
-    this.fields.fill(empty);}_createClass(board, [{ key: 'clone', value: 
+    this.fields.fill(empty);
+    this.hasher = null;
+    this.hash = 0;}_createClass(board, [{ key: 'initHasher', value: 
+
+    function initHasher() {
+      this.hasher = new hasher();
+      this.hasher.updateBoardHash(this);} }, { key: 'clone', value: 
 
     function clone() {
       var res = new board();
@@ -259,6 +265,8 @@ board = (function () {
       res.chains = new Map();var _iteratorNormalCompletion9 = true;var _didIteratorError9 = false;var _iteratorError9 = undefined;try {
         for (var _iterator9 = this.chains.keys()[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {var co = _step9.value;
           res.chains.set(co, this.chains.get(co).clone());}} catch (err) {_didIteratorError9 = true;_iteratorError9 = err;} finally {try {if (!_iteratorNormalCompletion9 && _iterator9['return']) {_iterator9['return']();}} finally {if (_didIteratorError9) {throw _iteratorError9;}}}
+      res.hasher = this.hasher;
+      res.hash = this.hash;
       return res;} }, { key: 'canPlace', value: 
 
     function canPlace(col, co) {
@@ -359,7 +367,10 @@ board = (function () {
         console.log('couldnt place at ' + co.toString());
         return false;}
 
+      var old = this.fields[coidx];
       this.fields[coidx] = col;
+      if (this.hasher !== null) 
+      this.hasher.fieldChanged(this, coidx, old, col);
 
       var ch = new chain(co, this.freeFieldsAround(co));
       this.chains.set(co.index(), ch);var _iteratorNormalCompletion18 = true;var _didIteratorError18 = false;var _iteratorError18 = undefined;try {
@@ -443,8 +454,10 @@ board = (function () {
         this.parents.set(idx, res);
         return res;} else 
 
-      return x;} }, { key: 'chainAt', value: 
+      return x;} }, { key: 'chainRepresenter', value: 
 
+    function chainRepresenter(co) {
+      return this.ufLookup(co);} }, { key: 'chainAt', value: 
 
     function chainAt(co) {
       var p = this.ufLookup(co);
@@ -484,7 +497,11 @@ board = (function () {
                 var och = this.chains.get(np.index());
                 assert(och);
                 och.addLib(f);}}} catch (err) {_didIteratorError24 = true;_iteratorError24 = err;} finally {try {if (!_iteratorNormalCompletion24 && _iterator24['return']) {_iterator24['return']();}} finally {if (_didIteratorError24) {throw _iteratorError24;}}}
-          this.fields[f.index()] = empty;
+          var old = this.fields[fidx];
+          this.fields[fidx] = empty;
+          if (this.hasher !== null) 
+          this.hasher.fieldChanged(this, fidx, old, empty);
+
           this.parents['delete'](fidx);}} catch (err) {_didIteratorError23 = true;_iteratorError23 = err;} finally {try {if (!_iteratorNormalCompletion23 && _iterator23['return']) {_iterator23['return']();}} finally {if (_didIteratorError23) {throw _iteratorError23;}}}} }, { key: 'toString', value: 
 
     function toString() {
@@ -601,7 +618,25 @@ function testBoardClone() {
   var b = new board();
   b.place(black, coord.fromName('C1'));
   var c = b.clone();
-  assert(c.numLibsAt(coord.fromName('C1')) == 3);}
+  assert(c.numLibsAt(coord.fromName('C1')) == 3);}var 
+
+
+hasher = (function () {
+  function hasher() {_classCallCheck(this, hasher);
+    var n = 3 * 19 * 19;
+    var hs = this.hashes = new Uint32Array(n);
+    for (var i = 0; i < n; i++) 
+    hs[i] = Math.floor(Math.random() * 0x100000000);}_createClass(hasher, [{ key: 'updateBoardHash', value: 
+
+    function updateBoardHash(board) {
+      var h = 0;
+      for (var idx = 0; idx < 361; idx++) 
+      h += this.hashes[3 * idx + board.fields[idx]];
+      board.hash = h;} }, { key: 'fieldChanged', value: 
+
+    function fieldChanged(board, index, old, theNew) {
+      var b = 3 * index;
+      board.hash += this.hashes[b + theNew] - this.hashes[b + old];} }]);return hasher;})();
 
 
 

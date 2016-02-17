@@ -250,8 +250,14 @@ export class board {
     this.chains = new Map()
     // field content
     this.fields = new Int8Array(S2)
-    this.fields.fill(empty)}
+    this.fields.fill(empty)
+    this.hasher = null
+    this.hash = 0}
 
+  initHasher() {
+    this.hasher = new hasher()
+    this.hasher.updateBoardHash(this)}
+  
   clone() {
     let res = new board();
     res.fields = new Int8Array(this.fields)
@@ -259,6 +265,8 @@ export class board {
     res.chains = new Map()
     for (let co of this.chains.keys()) {
       res.chains.set(co, this.chains.get(co).clone())}
+    res.hasher = this.hasher
+    res.hash = this.hash
     return res}
 
   canPlace(col, co) {
@@ -359,7 +367,10 @@ export class board {
       console.log('couldnt place at ' + co.toString())
       return false}
 
+    var old = this.fields[coidx]
     this.fields[coidx] = col
+    if (this.hasher !== null)
+      this.hasher.fieldChanged(this, coidx, old, col)
     
     let ch = new chain(co, this.freeFieldsAround(co))
     this.chains.set(co.index(), ch);
@@ -445,6 +456,8 @@ export class board {
     else
       return x}
 
+  chainRepresenter(co) {
+    return this.ufLookup(co)}
   
   chainAt(co) {
     let p = this.ufLookup(co)
@@ -484,7 +497,11 @@ export class board {
 	  let och = this.chains.get(np.index())
 	  assert(och)
 	  och.addLib(f)}}
-      this.fields[f.index()] = empty
+      var old = this.fields[fidx]
+      this.fields[fidx] = empty
+      if (this.hasher !== null)
+	this.hasher.fieldChanged(this, fidx, old, empty)
+      
       this.parents.delete(fidx)}}
   
   toString() {
@@ -602,6 +619,24 @@ function testBoardClone() {
   b.place(black, coord.fromName('C1'))
   let c = b.clone()
   assert(c.numLibsAt(coord.fromName('C1')) == 3)
+}
+
+class hasher {
+  constructor() {
+    var n = 3*19*19
+    var hs = this.hashes = new Uint32Array(n)
+    for (var i = 0; i < n; i++)
+      hs[i] = Math.floor(Math.random() * 0x100000000)}
+  
+  updateBoardHash(board) {
+    var h = 0
+    for (var idx = 0; idx < 361; idx++)
+      h += this.hashes[3*idx + board.fields[idx]]
+    board.hash = h}
+
+  fieldChanged(board, index, old, theNew) {
+    var b = 3*index
+    board.hash += this.hashes[b+theNew] - this.hashes[b+old]}
 }
 
 
